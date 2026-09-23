@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADK Gemini CAPTCHA Resolver</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/static/styles.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased flex flex-col">
+
+  <!-- Top Navigation Bar -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">
+            ADK CAPTCHA Resolver
+          </h1>
+          <p class="text-xs text-slate-400">Powered by Google Agent Development Kit & Gemini Vision</p>
+        </div>
+      </div>
+
+      <!-- Status Badges -->
+      <div class="flex items-center space-x-3">
+        <div id="connection-status" class="flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="connection-text">Load Balancer Active</span>
+        </div>
+        <div class="hidden sm:flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          <span id="model-badge">gemini-2.5-flash</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- Overview Banner -->
+    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-500/20 p-6 shadow-2xl">
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 mb-2">
+            <i data-lucide="zap" class="w-3 h-3"></i> Real-time Vision AI
+          </span>
+          <h2 class="text-2xl font-extrabold text-white">Automated Multi-Modal CAPTCHA Solver</h2>
+          <p class="text-sm text-slate-300 mt-1 max-w-2xl">
+            Upload, paste, or generate any CAPTCHA image (distorted text, math expressions, noise lines). 
+            Our ADK multimodal agent analyzes and resolves it in under a second.
+          </p>
+        </div>
+        <div class="flex items-center gap-2 text-xs text-slate-400 bg-slate-900/80 px-4 py-2.5 rounded-xl border border-slate-800">
+          <i data-lucide="clipboard" class="w-4 h-4 text-indigo-400"></i>
+          <span>Tip: Press <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 font-mono text-slate-200">Ctrl+V</kbd> anywhere to paste from clipboard</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workspace Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- Left Column: Image Source (Upload, Samples, Generator) -->
+      <div class="lg:col-span-5 space-y-6">
+        
+        <!-- Source Selector Tabs -->
+        <div class="bg-slate-900/60 rounded-2xl p-5 border border-slate-800/80 shadow-xl space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+              <i data-lucide="image-plus" class="w-4 h-4 text-indigo-400"></i> CAPTCHA Input Source
+            </h3>
+            <span class="text-xs text-slate-500">Select or drop</span>
+          </div>
+
+          <!-- Drag and Drop Zone -->
+          <div id="drop-zone" class="border-2 border-dashed border-slate-700 hover:border-indigo-500/60 rounded-xl p-6 text-center transition-all cursor-pointer bg-slate-950/40 hover:bg-indigo-950/10 group">
+            <input type="file" id="file-input" accept="image/*" class="hidden">
+            <div class="space-y-3">
+              <div class="w-12 h-12 mx-auto rounded-full bg-slate-800 group-hover:bg-indigo-600/20 flex items-center justify-center text-slate-400 group-hover:text-indigo-400 transition-colors">
+                <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-slate-200 group-hover:text-indigo-300">
+                  Click to upload or drag & drop
+                </p>
+                <p class="text-xs text-slate-500 mt-1">PNG, JPG, WEBP or GIF (Max 10MB)</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Generator Section -->
+          <div class="space-y-3 pt-2">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i data-lucide="sparkle" class="w-3.5 h-3.5 text-cyan-400"></i> Instant Generator
+              </label>
+              <span class="text-[11px] text-slate-500">Test immediately</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <button id="btn-gen-text" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 flex items-center justify-center gap-2 border border-slate-700 transition">
+                <i data-lucide="type" class="w-3.5 h-3.5 text-indigo-400"></i> Distorted Text
+              </button>
+              <button id="btn-gen-math" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 flex items-center justify-center gap-2 border border-slate-700 transition">
+                <i data-lucide="calculator" class="w-3.5 h-3.5 text-emerald-400"></i> Math Puzzle
+              </button>
+              <button id="btn-gen-noise" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 flex items-center justify-center gap-2 border border-slate-700 transition">
+                <i data-lucide="activity" class="w-3.5 h-3.5 text-amber-400"></i> Wavy & Noisy
+              </button>
+              <button id="btn-gen-combo" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 flex items-center justify-center gap-2 border border-slate-700 transition">
+                <i data-lucide="shuffle" class="w-3.5 h-3.5 text-purple-400"></i> Alphanumeric
+              </button>
+            </div>
+          </div>
+
+          <!-- Hidden canvas for client-side captcha synthesis -->
+          <canvas id="captcha-canvas" width="300" height="100" class="hidden"></canvas>
+        </div>
+
+        <!-- Quick Sample Presets -->
+        <div class="bg-slate-900/60 rounded-2xl p-5 border border-slate-800/80 shadow-xl space-y-3">
+          <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+            <i data-lucide="layout-grid" class="w-4 h-4 text-indigo-400"></i> Curated Test Presets
+          </h3>
+          <div class="grid grid-cols-2 gap-3" id="presets-container">
+            <!-- Populated via app.js -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Live Preview & AI Solver Output -->
+      <div class="lg:col-span-7 space-y-6">
+
+        <!-- Image Preview & Action Box -->
+        <div class="bg-slate-900/60 rounded-2xl p-6 border border-slate-800/80 shadow-xl space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+              <i data-lucide="eye" class="w-4 h-4 text-cyan-400"></i> Selected CAPTCHA Preview
+            </h3>
+            <span id="preview-meta" class="text-xs text-slate-500">Ready</span>
+          </div>
+
+          <!-- Preview Frame -->
+          <div class="relative bg-slate-950 rounded-xl p-4 border border-slate-800/80 min-h-[160px] flex items-center justify-center overflow-hidden">
+            <div id="empty-state" class="text-center py-6 text-slate-500">
+              <i data-lucide="image" class="w-10 h-10 mx-auto mb-2 opacity-40"></i>
+              <p class="text-xs">No image selected. Upload or generate one from the left.</p>
+            </div>
+            <img id="image-preview" src="" alt="CAPTCHA Preview" class="hidden max-h-48 max-w-full rounded-lg shadow-md border border-slate-800 object-contain">
+          </div>
+
+          <!-- Solve Button -->
+          <button id="btn-solve" disabled class="w-full py-3.5 px-6 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 shadow-lg shadow-indigo-500/25 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center space-x-2">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span id="btn-solve-text">Resolve with ADK Gemini</span>
+          </button>
+        </div>
+
+        <!-- Resolution Result Card -->
+        <div id="result-card" class="hidden bg-slate-900/80 rounded-2xl p-6 border border-indigo-500/30 shadow-2xl space-y-5 transition-all">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center space-x-2">
+              <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                <i data-lucide="check-circle" class="w-4 h-4"></i>
+              </div>
+              <h3 class="text-base font-bold text-white">CAPTCHA Resolved</h3>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span id="result-type-badge" class="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800 text-indigo-300 border border-slate-700">
+                Alphanumeric
+              </span>
+              <span id="result-latency-badge" class="px-2.5 py-1 rounded-full text-xs font-mono text-slate-400 bg-slate-800/80 border border-slate-700">
+                720ms
+              </span>
+            </div>
+          </div>
+
+          <!-- Main Solution Display -->
+          <div class="bg-slate-950 rounded-xl p-5 border border-indigo-500/20 flex items-center justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1">Solved Answer</p>
+              <p id="result-solution" class="text-3xl sm:text-4xl font-mono font-black text-white tracking-widest selection:bg-indigo-500">
+                ------
+              </p>
+            </div>
+            <button id="btn-copy" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 flex items-center gap-2 transition active:scale-95">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+              <span id="btn-copy-text">Copy</span>
+            </button>
+          </div>
+
+          <!-- Details & Explanation -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800/80">
+              <span class="text-xs text-slate-500 block mb-1">Confidence Rating</span>
+              <div class="flex items-center space-x-2">
+                <span id="confidence-indicator" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                <span id="result-confidence" class="text-sm font-semibold text-slate-200">High (99.4%)</span>
+              </div>
+            </div>
+            <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800/80">
+              <span class="text-xs text-slate-500 block mb-1">Inference Engine</span>
+              <span class="text-sm font-semibold text-indigo-300 flex items-center gap-1.5">
+                <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Google Vertex AI (ADK)
+              </span>
+            </div>
+          </div>
+
+          <!-- Step-by-step reasoning -->
+          <div class="bg-slate-950/40 p-4 rounded-xl border border-slate-800/60">
+            <p class="text-xs font-semibold text-slate-400 mb-1 flex items-center gap-1.5">
+              <i data-lucide="brain-circuit" class="w-3.5 h-3.5 text-cyan-400"></i> AI Visual Analysis Breakdown
+            </p>
+            <p id="result-explanation" class="text-xs text-slate-300 leading-relaxed font-mono">
+              Analyzing characters...
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- History Log Section -->
+    <section class="bg-slate-900/60 rounded-2xl p-6 border border-slate-800/80 shadow-xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+          <i data-lucide="history" class="w-4 h-4 text-indigo-400"></i> Session Resolution History
+        </h3>
+        <button id="btn-clear-history" class="text-xs text-slate-500 hover:text-slate-300 transition">
+          Clear history
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead>
+            <tr class="text-slate-400 border-b border-slate-800">
+              <th class="py-2.5 px-3">Thumbnail</th>
+              <th class="py-2.5 px-3">Type</th>
+              <th class="py-2.5 px-3">Solution</th>
+              <th class="py-2.5 px-3">Confidence</th>
+              <th class="py-2.5 px-3">Latency</th>
+              <th class="py-2.5 px-3 text-right">Time</th>
+            </tr>
+          </thead>
+          <tbody id="history-table-body" class="divide-y divide-slate-800/60 text-slate-300">
+            <tr id="empty-history-row">
+              <td colspan="6" class="py-6 text-center text-slate-500">
+                No CAPTCHAs solved yet in this session.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 py-4 text-center text-xs text-slate-500">
+    ADK Gemini CAPTCHA Resolver &bull; Deployed on Google Cloud &bull; Connected to Load Balancer
+  </footer>
+
+  <script src="/static/app.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
