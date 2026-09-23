@@ -83,14 +83,80 @@ async def handle_info(request):
         "load_balancer_compatible": True
     })
 
+async def handle_samples(request):
+    """Return available sample CAPTCHA images bundled in the project resources."""
+    samples = [
+        {
+            "id": "alphanumeric",
+            "title": "Alphanumeric Code",
+            "type": "alphanumeric",
+            "description": "Distorted characters 'K8N49P' with strike-through lines & noise",
+            "url": "/static/samples/sample_alphanumeric.jpg",
+            "expected": "K8N49P"
+        },
+        {
+            "id": "math",
+            "title": "Math Arithmetic Challenge",
+            "type": "math",
+            "description": "Math problem '24 + 17 = ?' on textured paper with scratches",
+            "url": "/static/samples/sample_math.jpg",
+            "expected": "41"
+        },
+        {
+            "id": "grid",
+            "title": "3x3 Object Grid Selection",
+            "type": "grid_selection",
+            "description": "Photo verification: 'Select all squares with traffic lights'",
+            "url": "/static/samples/sample_grid.jpg",
+            "expected": "Tiles 2, 6, 7"
+        },
+        {
+            "id": "word",
+            "title": "Warped Word Puzzle",
+            "type": "word",
+            "description": "Distorted dictionary word 'overlook' with wavy ripple lines",
+            "url": "/static/samples/sample_word.jpg",
+            "expected": "overlook"
+        },
+        {
+            "id": "wavy",
+            "title": "Colorful Wavy Distorted",
+            "type": "alphanumeric",
+            "description": "High-contrast distorted text 'R9X2B5' with swirl interference",
+            "url": "/static/samples/sample_wavy.jpg",
+            "expected": "R9X2B5"
+        }
+    ]
+    return web.json_response({"samples": samples, "count": len(samples)})
+
 async def handle_solve(request):
     """Main CAPTCHA resolution endpoint."""
     start_time = time.time()
     try:
         data = await request.json()
         image_data = data.get("image")
+        sample_id = data.get("sample_id")
+
+        # Fallback to load bundled project resource if sample_id provided
+        if not image_data and sample_id:
+            sample_file_map = {
+                "alphanumeric": "sample_alphanumeric.jpg",
+                "math": "sample_math.jpg",
+                "grid": "sample_grid.jpg",
+                "word": "sample_word.jpg",
+                "wavy": "sample_wavy.jpg"
+            }
+            if sample_id in sample_file_map:
+                filename = sample_file_map[sample_id]
+                sample_path = os.path.join(os.path.dirname(__file__), "static", "samples", filename)
+                if os.path.exists(sample_path):
+                    with open(sample_path, "rb") as f:
+                        raw_bytes = f.read()
+                        b64 = base64.b64encode(raw_bytes).decode("utf-8")
+                        image_data = f"data:image/jpeg;base64,{b64}"
+
         if not image_data:
-            return web.json_response({"error": "No image data provided"}, status=400)
+            return web.json_response({"error": "No image or sample_id provided"}, status=400)
 
         # Parse base64 data URL (e.g., data:image/png;base64,iVBOR...)
         mime_type = "image/png"
@@ -174,6 +240,7 @@ def create_app():
     app.router.add_get("/health", handle_health)
     app.router.add_get("/api/health", handle_health)
     app.router.add_get("/api/info", handle_info)
+    app.router.add_get("/api/samples", handle_samples)
     app.router.add_post("/api/solve", handle_solve)
 
     # Static assets

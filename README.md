@@ -7,6 +7,7 @@ An intelligent CAPTCHA analysis and resolution service powered by **Google Agent
 - **Multimodal CAPTCHA Analysis**: Resolves alphanumeric, math puzzles, grid selection, and word challenges using Gemini Vision.
 - **RESTful API**: Fast asynchronous endpoints built with `aiohttp` for image ingestion and structured JSON output.
 - **Interactive Web Interface**: Single-page dashboard built with Tailwind CSS and Lucide icons to upload, test, and inspect CAPTCHA resolutions in real-time.
+- **Bundled Project Sample Resources**: Pre-packaged authentic CAPTCHA challenges (alphanumeric, arithmetic math, 3x3 photo grids, and warped dictionary words) for 1-click agent demonstrations.
 - **Production-Ready Containerization**: Dockerfile configured for deployment to **Google Cloud Run** and container runtimes.
 - **Health & Info Endpoints**: `/health` and `/api/info` endpoints for load balancing, monitoring, and readiness checks.
 
@@ -23,7 +24,8 @@ An intelligent CAPTCHA analysis and resolution service powered by **Google Agent
 | `GET` | `/` | Web user interface |
 | `GET` | `/health` / `/api/health` | Health check endpoint |
 | `GET` | `/api/info` | Service metadata and model configuration |
-| `POST` | `/api/solve` | Submit CAPTCHA image (base64) for resolution |
+| `GET` | `/api/samples` | List bundled project CAPTCHA resources for demonstrations |
+| `POST` | `/api/solve` | Submit CAPTCHA image (base64) or `sample_id` for resolution |
 
 ### Example Request (`/api/solve`)
 

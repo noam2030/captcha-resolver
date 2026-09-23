@@ -25,6 +25,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnClearHistory = document.getElementById('btn-clear-history');
   const presetsContainer = document.getElementById('presets-container');
 
+  // Tab elements
+  const tabBtnResources = document.getElementById('tab-btn-resources');
+  const tabBtnUpload = document.getElementById('tab-btn-upload');
+  const tabBtnGenerator = document.getElementById('tab-btn-generator');
+  const tabContentResources = document.getElementById('tab-content-resources');
+  const tabContentUpload = document.getElementById('tab-content-upload');
+  const tabContentGenerator = document.getElementById('tab-content-generator');
+  const samplesGallery = document.getElementById('samples-gallery');
+  const btnReloadSamples = document.getElementById('btn-reload-samples');
+
   // Generator buttons
   const btnGenText = document.getElementById('btn-gen-text');
   const btnGenMath = document.getElementById('btn-gen-math');
@@ -36,7 +46,37 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentImageDataUrl = null;
   const historyLog = [];
 
-  // Initialize presets
+  // Tab Navigation setup
+  function setActiveTab(tab) {
+    const inactiveClass = 'flex-1 py-2 px-2.5 rounded-lg text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1.5 transition';
+    const activeClass = 'flex-1 py-2 px-2.5 rounded-lg text-white bg-indigo-600 shadow flex items-center justify-center gap-1.5 transition';
+
+    [tabBtnResources, tabBtnUpload, tabBtnGenerator].forEach(btn => {
+      if (btn) btn.className = inactiveClass;
+    });
+    [tabContentResources, tabContentUpload, tabContentGenerator].forEach(content => {
+      if (content) content.classList.add('hidden');
+    });
+
+    if (tab === 'resources' && tabBtnResources && tabContentResources) {
+      tabBtnResources.className = activeClass;
+      tabContentResources.classList.remove('hidden');
+    } else if (tab === 'upload' && tabBtnUpload && tabContentUpload) {
+      tabBtnUpload.className = activeClass;
+      tabContentUpload.classList.remove('hidden');
+    } else if (tab === 'generator' && tabBtnGenerator && tabContentGenerator) {
+      tabBtnGenerator.className = activeClass;
+      tabContentGenerator.classList.remove('hidden');
+    }
+    if (window.lucide) lucide.createIcons();
+  }
+
+  if (tabBtnResources) tabBtnResources.addEventListener('click', () => setActiveTab('resources'));
+  if (tabBtnUpload) tabBtnUpload.addEventListener('click', () => setActiveTab('upload'));
+  if (tabBtnGenerator) tabBtnGenerator.addEventListener('click', () => setActiveTab('generator'));
+
+  // Initialize
+  loadSamplesGallery();
   initPresets();
   checkHealth();
 
@@ -211,8 +251,157 @@ document.addEventListener('DOMContentLoaded', () => {
     drawCaptcha(text, { lines: 7 });
   });
 
-  // --- Curated Preset Thumbnails ---
+  // --- Project Resources Samples Gallery ---
+  const DEFAULT_SAMPLES = [
+    {
+      id: "alphanumeric",
+      title: "Alphanumeric Code",
+      type: "alphanumeric",
+      badgeClass: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
+      description: "Distorted characters 'K8N49P' with scratch noise & strike lines",
+      url: "/static/samples/sample_alphanumeric.jpg",
+      expected: "K8N49P"
+    },
+    {
+      id: "math",
+      title: "Math Arithmetic Challenge",
+      type: "math",
+      badgeClass: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+      description: "Math problem '24 + 17 = ?' on textured paper with scratches",
+      url: "/static/samples/sample_math.jpg",
+      expected: "41"
+    },
+    {
+      id: "grid",
+      title: "3x3 Object Grid Selection",
+      type: "grid_selection",
+      badgeClass: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+      description: "Photo verification: 'Select all squares with traffic lights'",
+      url: "/static/samples/sample_grid.jpg",
+      expected: "Tiles 2, 6, 7"
+    },
+    {
+      id: "word",
+      title: "Warped Word Puzzle",
+      type: "word",
+      badgeClass: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+      description: "Distorted dictionary word 'overlook' with wavy ripple lines",
+      url: "/static/samples/sample_word.jpg",
+      expected: "overlook"
+    },
+    {
+      id: "wavy",
+      title: "Colorful Wavy Distorted",
+      type: "alphanumeric",
+      badgeClass: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+      description: "High-contrast distorted text 'R9X2B5' with swirl interference",
+      url: "/static/samples/sample_wavy.jpg",
+      expected: "R9X2B5"
+    }
+  ];
+
+  let activeSampleCard = null;
+
+  async function loadSamplesGallery() {
+    let samples = DEFAULT_SAMPLES;
+    try {
+      const res = await fetch('/api/samples');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.samples && data.samples.length > 0) {
+          samples = data.samples;
+        }
+      }
+    } catch (e) {
+      console.warn('Using default samples list');
+    }
+
+    renderSamplesGallery(samples);
+  }
+
+  function renderSamplesGallery(samples) {
+    if (!samplesGallery) return;
+    samplesGallery.innerHTML = '';
+
+    samples.forEach((sample, idx) => {
+      const card = document.createElement('div');
+      card.className = 'p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-indigo-500/60 cursor-pointer transition flex items-center gap-3.5 group';
+      card.dataset.id = sample.id;
+
+      const typeBadgeClass = sample.badgeClass || (
+        sample.type === 'math' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+        sample.type === 'grid_selection' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+        sample.type === 'word' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
+        'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+      );
+
+      card.innerHTML = `
+        <div class="relative shrink-0">
+          <img src="${sample.url}" alt="${sample.title}" class="w-20 h-14 object-cover rounded-lg border border-slate-800 bg-slate-900 group-hover:scale-105 transition-transform">
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="sample-title text-xs font-semibold text-white group-hover:text-indigo-300 truncate">${sample.title}</span>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-medium border ${typeBadgeClass}">
+              ${sample.type}
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-400 line-clamp-1 leading-snug">${sample.description}</p>
+          <div class="flex items-center justify-between mt-1 text-[11px]">
+            <span class="text-slate-500 font-mono text-[10px]">Expected: <span class="text-slate-300">${sample.expected}</span></span>
+            <span class="text-indigo-400 font-medium group-hover:text-indigo-300 flex items-center gap-1 text-[11px]">
+              Load <i data-lucide="arrow-right" class="w-3 h-3"></i>
+            </span>
+          </div>
+        </div>
+      `;
+
+      card.addEventListener('click', () => {
+        selectSample(sample, card);
+      });
+
+      samplesGallery.appendChild(card);
+
+      // Select first sample automatically on initial load
+      if (idx === 0) {
+        selectSample(sample, card);
+      }
+    });
+
+    if (window.lucide) lucide.createIcons();
+  }
+
+  async function selectSample(sample, cardElement) {
+    if (activeSampleCard) {
+      activeSampleCard.classList.remove('sample-card-active');
+    }
+    activeSampleCard = cardElement;
+    if (activeSampleCard) {
+      activeSampleCard.classList.add('sample-card-active');
+    }
+
+    try {
+      previewMeta.textContent = `Loading ${sample.title}...`;
+      const res = await fetch(sample.url);
+      const blob = await res.blob();
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        loadImage(e.target.result, `${sample.title} • Expected: ${sample.expected}`);
+      };
+      reader.readAsDataURL(blob);
+    } catch (err) {
+      console.error('Failed to convert sample image to dataURL', err);
+      loadImage(sample.url, `${sample.title} • Expected: ${sample.expected}`);
+    }
+  }
+
+  if (btnReloadSamples) {
+    btnReloadSamples.addEventListener('click', () => loadSamplesGallery());
+  }
+
+  // --- Curated Preset Thumbnails (Generator Tab) ---
   function initPresets() {
+    if (!presetsContainer) return;
     const presets = [
       { name: 'Alphanumeric Noise', text: '7B3k9', lines: 6 },
       { name: 'Math Challenge', text: '14 + 8 = ?', lines: 3 },
@@ -221,8 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     presetsContainer.innerHTML = '';
-    presets.forEach((preset, index) => {
-      // Draw preset onto mini canvas
+    presets.forEach((preset) => {
       const pCanvas = document.createElement('canvas');
       pCanvas.width = 160;
       pCanvas.height = 55;
@@ -252,17 +440,15 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
 
       card.addEventListener('click', () => {
-        // Draw full version into preview
+        if (activeSampleCard) {
+          activeSampleCard.classList.remove('sample-card-active');
+          activeSampleCard = null;
+        }
         drawCaptcha(preset.text, { lines: preset.lines });
       });
 
       presetsContainer.appendChild(card);
     });
-
-    // Generate initial image automatically
-    setTimeout(() => {
-      drawCaptcha('ADK94x', { lines: 6 });
-    }, 200);
   }
 
   // --- Solve Action ---

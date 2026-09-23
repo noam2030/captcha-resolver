@@ -36,3 +36,15 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(99, 102, 241, 0.8);
 }
+
+/* Sample Resource Cards */
+.sample-card-active {
+  border-color: rgba(99, 102, 241, 0.9) !important;
+  background-color: rgba(30, 27, 75, 0.6) !important;
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.35);
+}
+
+.sample-card-active .sample-title {
+  color: #a5b4fc !important;
+}
+
