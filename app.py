@@ -155,6 +155,17 @@ async def handle_solve(request):
                         b64 = base64.b64encode(raw_bytes).decode("utf-8")
                         image_data = f"data:image/jpeg;base64,{b64}"
 
+        # Handle case where image_data is a static path / URL
+        if image_data and (image_data.startswith("/static/") or image_data.startswith("static/")):
+            rel_path = image_data.lstrip("/")
+            file_path = os.path.join(os.path.dirname(__file__), rel_path)
+            if os.path.exists(file_path):
+                with open(file_path, "rb") as f:
+                    raw_bytes = f.read()
+                    b64 = base64.b64encode(raw_bytes).decode("utf-8")
+                    mime = "image/jpeg" if file_path.endswith((".jpg", ".jpeg")) else "image/png"
+                    image_data = f"data:{mime};base64,{b64}"
+
         if not image_data:
             return web.json_response({"error": "No image or sample_id provided"}, status=400)
 
@@ -228,9 +239,13 @@ async def handle_solve(request):
         }, status=500)
 
 async def handle_index(request):
-    """Serve the single-page frontend application."""
+    """Serve the single-page frontend application with no-cache headers."""
     index_path = os.path.join(os.path.dirname(__file__), "static", "index.html")
-    return web.FileResponse(index_path)
+    response = web.FileResponse(index_path)
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 def create_app():
     app = web.Application()

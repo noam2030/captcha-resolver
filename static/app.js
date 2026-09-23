@@ -23,91 +23,118 @@ document.addEventListener('DOMContentLoaded', () => {
   const historyTableBody = document.getElementById('history-table-body');
   const emptyHistoryRow = document.getElementById('empty-history-row');
   const btnClearHistory = document.getElementById('btn-clear-history');
-  const presetsContainer = document.getElementById('presets-container');
 
-  // Tab elements
-  const tabBtnResources = document.getElementById('tab-btn-resources');
-  const tabBtnUpload = document.getElementById('tab-btn-upload');
-  const tabBtnGenerator = document.getElementById('tab-btn-generator');
-  const tabContentResources = document.getElementById('tab-content-resources');
-  const tabContentUpload = document.getElementById('tab-content-upload');
-  const tabContentGenerator = document.getElementById('tab-content-generator');
-  const samplesGallery = document.getElementById('samples-gallery');
-  const btnReloadSamples = document.getElementById('btn-reload-samples');
-
-  // Generator buttons
+  // Generator elements
   const btnGenText = document.getElementById('btn-gen-text');
   const btnGenMath = document.getElementById('btn-gen-math');
   const btnGenNoise = document.getElementById('btn-gen-noise');
   const btnGenCombo = document.getElementById('btn-gen-combo');
   const canvas = document.getElementById('captcha-canvas');
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas ? canvas.getContext('2d') : null;
+
+  // 4 Small Project Sample Icon Buttons
+  const sampleIconBtns = document.querySelectorAll('.sample-icon-btn');
 
   let currentImageDataUrl = null;
-  const historyLog = [];
-
-  // Tab Navigation setup
-  function setActiveTab(tab) {
-    const inactiveClass = 'flex-1 py-2 px-2.5 rounded-lg text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1.5 transition';
-    const activeClass = 'flex-1 py-2 px-2.5 rounded-lg text-white bg-indigo-600 shadow flex items-center justify-center gap-1.5 transition';
-
-    [tabBtnResources, tabBtnUpload, tabBtnGenerator].forEach(btn => {
-      if (btn) btn.className = inactiveClass;
-    });
-    [tabContentResources, tabContentUpload, tabContentGenerator].forEach(content => {
-      if (content) content.classList.add('hidden');
-    });
-
-    if (tab === 'resources' && tabBtnResources && tabContentResources) {
-      tabBtnResources.className = activeClass;
-      tabContentResources.classList.remove('hidden');
-    } else if (tab === 'upload' && tabBtnUpload && tabContentUpload) {
-      tabBtnUpload.className = activeClass;
-      tabContentUpload.classList.remove('hidden');
-    } else if (tab === 'generator' && tabBtnGenerator && tabContentGenerator) {
-      tabBtnGenerator.className = activeClass;
-      tabContentGenerator.classList.remove('hidden');
-    }
-    if (window.lucide) lucide.createIcons();
-  }
-
-  if (tabBtnResources) tabBtnResources.addEventListener('click', () => setActiveTab('resources'));
-  if (tabBtnUpload) tabBtnUpload.addEventListener('click', () => setActiveTab('upload'));
-  if (tabBtnGenerator) tabBtnGenerator.addEventListener('click', () => setActiveTab('generator'));
 
   // Initialize
-  loadSamplesGallery();
-  initPresets();
+  initSampleIcons();
   checkHealth();
 
-  // --- Upload / File Drag-and-Drop ---
-  dropZone.addEventListener('click', () => fileInput.click());
+  // --- 4 Small Sample Icon Previews ---
+  function initSampleIcons() {
+    sampleIconBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        // Clear active states on all sample buttons
+        sampleIconBtns.forEach(b => b.classList.remove('selected', 'ring-2', 'ring-indigo-500', 'border-indigo-500'));
+        // Mark clicked button as selected
+        btn.classList.add('selected', 'ring-2', 'ring-indigo-500', 'border-indigo-500');
 
-  dropZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropZone.classList.add('border-indigo-500', 'bg-indigo-950/20');
-  });
-
-  ['dragleave', 'dragend'].forEach(type => {
-    dropZone.addEventListener(type, () => {
-      dropZone.classList.remove('border-indigo-500', 'bg-indigo-950/20');
+        const src = btn.getAttribute('data-src');
+        const title = btn.getAttribute('data-title') || 'Sample Challenge';
+        selectSampleAsUploaded(src, title);
+      });
     });
-  });
 
-  dropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropZone.classList.remove('border-indigo-500', 'bg-indigo-950/20');
-    const files = e.dataTransfer.files;
-    if (files.length > 0 && files[0].type.startsWith('image/')) {
-      handleFile(files[0]);
+    // Auto-select the first sample icon on page load
+    if (sampleIconBtns.length > 0) {
+      setTimeout(() => {
+        sampleIconBtns[0].click();
+      }, 100);
     }
-  });
+  }
 
-  fileInput.addEventListener('change', (e) => {
-    if (e.target.files.length > 0) {
-      handleFile(e.target.files[0]);
-    }
-  });
+  function selectSampleAsUploaded(imageSrc, label) {
+    previewMeta.textContent = `Loading ${label}...`;
+
+    // Convert image to Base64 Data URL via canvas so it functions exactly like an uploaded file
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.onload = () => {
+      try {
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = img.naturalWidth || 600;
+        offCanvas.height = img.naturalHeight || 300;
+        const offCtx = offCanvas.getContext('2d');
+        offCtx.drawImage(img, 0, 0);
+        const dataUrl = offCanvas.toDataURL('image/jpeg', 0.95);
+        loadImage(dataUrl, label);
+      } catch (err) {
+        fallbackFetchToDataUrl(imageSrc, label);
+      }
+    };
+    img.onerror = () => {
+      fallbackFetchToDataUrl(imageSrc, label);
+    };
+    img.src = imageSrc;
+  }
+
+  function fallbackFetchToDataUrl(url, label) {
+    fetch(url)
+      .then(r => r.blob())
+      .then(blob => {
+        const reader = new FileReader();
+        reader.onload = (e) => loadImage(e.target.result, label);
+        reader.readAsDataURL(blob);
+      })
+      .catch(() => {
+        // Fallback: pass image URL directly (app.py handles static paths too!)
+        loadImage(url, label);
+      });
+  }
+
+  // --- Upload / File Drag-and-Drop ---
+  if (dropZone) {
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('border-indigo-500', 'bg-indigo-950/20');
+    });
+
+    ['dragleave', 'dragend'].forEach(type => {
+      dropZone.addEventListener(type, () => {
+        dropZone.classList.remove('border-indigo-500', 'bg-indigo-950/20');
+      });
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-indigo-500', 'bg-indigo-950/20');
+      const files = e.dataTransfer.files;
+      if (files.length > 0 && files[0].type.startsWith('image/')) {
+        handleFile(files[0]);
+      }
+    });
+  }
+
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFile(e.target.files[0]);
+      }
+    });
+  }
 
   // --- Clipboard Paste Listener ---
   window.addEventListener('paste', (e) => {
@@ -122,6 +149,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function handleFile(file, customName) {
+    // Clear selection on sample icons when custom file uploaded
+    sampleIconBtns.forEach(b => b.classList.remove('selected', 'ring-2', 'ring-indigo-500', 'border-indigo-500'));
+
     const reader = new FileReader();
     reader.onload = (e) => {
       loadImage(e.target.result, customName || file.name || 'Uploaded CAPTCHA');
@@ -153,6 +183,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function drawCaptcha(text, options = {}) {
+    if (!canvas || !ctx) return;
+    sampleIconBtns.forEach(b => b.classList.remove('selected', 'ring-2', 'ring-indigo-500', 'border-indigo-500'));
+
     canvas.width = 320;
     canvas.height = 100;
 
@@ -227,227 +260,35 @@ document.addEventListener('DOMContentLoaded', () => {
     loadImage(dataUrl, `Generated (${text})`);
   }
 
-  btnGenText.addEventListener('click', () => {
-    const text = getRandomString(5);
-    drawCaptcha(text, { lines: 5 });
-  });
-
-  btnGenMath.addEventListener('click', () => {
-    const n1 = Math.floor(Math.random() * 20) + 1;
-    const n2 = Math.floor(Math.random() * 10) + 1;
-    const ops = ['+', '-', 'x'];
-    const op = ops[Math.floor(Math.random() * ops.length)];
-    const text = `${n1} ${op} ${n2} = ?`;
-    drawCaptcha(text, { lines: 4 });
-  });
-
-  btnGenNoise.addEventListener('click', () => {
-    const text = getRandomString(6);
-    drawCaptcha(text, { lines: 10 });
-  });
-
-  btnGenCombo.addEventListener('click', () => {
-    const text = getRandomString(4).toUpperCase() + Math.floor(Math.random() * 90 + 10);
-    drawCaptcha(text, { lines: 7 });
-  });
-
-  // --- Project Resources Samples Gallery ---
-  const DEFAULT_SAMPLES = [
-    {
-      id: "alphanumeric",
-      title: "Alphanumeric Code",
-      type: "alphanumeric",
-      badgeClass: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
-      description: "Distorted characters 'K8N49P' with scratch noise & strike lines",
-      url: "/static/samples/sample_alphanumeric.jpg",
-      expected: "K8N49P"
-    },
-    {
-      id: "math",
-      title: "Math Arithmetic Challenge",
-      type: "math",
-      badgeClass: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-      description: "Math problem '24 + 17 = ?' on textured paper with scratches",
-      url: "/static/samples/sample_math.jpg",
-      expected: "41"
-    },
-    {
-      id: "grid",
-      title: "3x3 Object Grid Selection",
-      type: "grid_selection",
-      badgeClass: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-      description: "Photo verification: 'Select all squares with traffic lights'",
-      url: "/static/samples/sample_grid.jpg",
-      expected: "Tiles 2, 6, 7"
-    },
-    {
-      id: "word",
-      title: "Warped Word Puzzle",
-      type: "word",
-      badgeClass: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-      description: "Distorted dictionary word 'overlook' with wavy ripple lines",
-      url: "/static/samples/sample_word.jpg",
-      expected: "overlook"
-    },
-    {
-      id: "wavy",
-      title: "Colorful Wavy Distorted",
-      type: "alphanumeric",
-      badgeClass: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-      description: "High-contrast distorted text 'R9X2B5' with swirl interference",
-      url: "/static/samples/sample_wavy.jpg",
-      expected: "R9X2B5"
-    }
-  ];
-
-  let activeSampleCard = null;
-
-  async function loadSamplesGallery() {
-    let samples = DEFAULT_SAMPLES;
-    try {
-      const res = await fetch('/api/samples');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.samples && data.samples.length > 0) {
-          samples = data.samples;
-        }
-      }
-    } catch (e) {
-      console.warn('Using default samples list');
-    }
-
-    renderSamplesGallery(samples);
-  }
-
-  function renderSamplesGallery(samples) {
-    if (!samplesGallery) return;
-    samplesGallery.innerHTML = '';
-
-    samples.forEach((sample, idx) => {
-      const card = document.createElement('div');
-      card.className = 'p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-indigo-500/60 cursor-pointer transition flex items-center gap-3.5 group';
-      card.dataset.id = sample.id;
-
-      const typeBadgeClass = sample.badgeClass || (
-        sample.type === 'math' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-        sample.type === 'grid_selection' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-        sample.type === 'word' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
-        'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
-      );
-
-      card.innerHTML = `
-        <div class="relative shrink-0">
-          <img src="${sample.url}" alt="${sample.title}" class="w-20 h-14 object-cover rounded-lg border border-slate-800 bg-slate-900 group-hover:scale-105 transition-transform">
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="sample-title text-xs font-semibold text-white group-hover:text-indigo-300 truncate">${sample.title}</span>
-            <span class="px-1.5 py-0.5 rounded text-[10px] font-medium border ${typeBadgeClass}">
-              ${sample.type}
-            </span>
-          </div>
-          <p class="text-[11px] text-slate-400 line-clamp-1 leading-snug">${sample.description}</p>
-          <div class="flex items-center justify-between mt-1 text-[11px]">
-            <span class="text-slate-500 font-mono text-[10px]">Expected: <span class="text-slate-300">${sample.expected}</span></span>
-            <span class="text-indigo-400 font-medium group-hover:text-indigo-300 flex items-center gap-1 text-[11px]">
-              Load <i data-lucide="arrow-right" class="w-3 h-3"></i>
-            </span>
-          </div>
-        </div>
-      `;
-
-      card.addEventListener('click', () => {
-        selectSample(sample, card);
-      });
-
-      samplesGallery.appendChild(card);
-
-      // Select first sample automatically on initial load
-      if (idx === 0) {
-        selectSample(sample, card);
-      }
+  if (btnGenText) {
+    btnGenText.addEventListener('click', () => {
+      const text = getRandomString(5);
+      drawCaptcha(text, { lines: 5 });
     });
-
-    if (window.lucide) lucide.createIcons();
   }
 
-  async function selectSample(sample, cardElement) {
-    if (activeSampleCard) {
-      activeSampleCard.classList.remove('sample-card-active');
-    }
-    activeSampleCard = cardElement;
-    if (activeSampleCard) {
-      activeSampleCard.classList.add('sample-card-active');
-    }
-
-    try {
-      previewMeta.textContent = `Loading ${sample.title}...`;
-      const res = await fetch(sample.url);
-      const blob = await res.blob();
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        loadImage(e.target.result, `${sample.title} • Expected: ${sample.expected}`);
-      };
-      reader.readAsDataURL(blob);
-    } catch (err) {
-      console.error('Failed to convert sample image to dataURL', err);
-      loadImage(sample.url, `${sample.title} • Expected: ${sample.expected}`);
-    }
+  if (btnGenMath) {
+    btnGenMath.addEventListener('click', () => {
+      const n1 = Math.floor(Math.random() * 20) + 1;
+      const n2 = Math.floor(Math.random() * 10) + 1;
+      const ops = ['+', '-', 'x'];
+      const op = ops[Math.floor(Math.random() * ops.length)];
+      const text = `${n1} ${op} ${n2} = ?`;
+      drawCaptcha(text, { lines: 4 });
+    });
   }
 
-  if (btnReloadSamples) {
-    btnReloadSamples.addEventListener('click', () => loadSamplesGallery());
+  if (btnGenNoise) {
+    btnGenNoise.addEventListener('click', () => {
+      const text = getRandomString(6);
+      drawCaptcha(text, { lines: 10 });
+    });
   }
 
-  // --- Curated Preset Thumbnails (Generator Tab) ---
-  function initPresets() {
-    if (!presetsContainer) return;
-    const presets = [
-      { name: 'Alphanumeric Noise', text: '7B3k9', lines: 6 },
-      { name: 'Math Challenge', text: '14 + 8 = ?', lines: 3 },
-      { name: 'Wavy Distorted', text: 'Xy49W', lines: 8 },
-      { name: 'Verification Code', text: '59284', lines: 5 }
-    ];
-
-    presetsContainer.innerHTML = '';
-    presets.forEach((preset) => {
-      const pCanvas = document.createElement('canvas');
-      pCanvas.width = 160;
-      pCanvas.height = 55;
-      const pCtx = pCanvas.getContext('2d');
-      pCtx.fillStyle = '#1e293b';
-      pCtx.fillRect(0, 0, pCanvas.width, pCanvas.height);
-
-      for (let i = 0; i < 3; i++) {
-        pCtx.strokeStyle = 'rgba(99, 102, 241, 0.4)';
-        pCtx.beginPath();
-        pCtx.moveTo(0, Math.random() * pCanvas.height);
-        pCtx.lineTo(pCanvas.width, Math.random() * pCanvas.height);
-        pCtx.stroke();
-      }
-
-      pCtx.fillStyle = '#38bdf8';
-      pCtx.font = 'bold 20px Arial';
-      pCtx.textAlign = 'center';
-      pCtx.textBaseline = 'middle';
-      pCtx.fillText(preset.text, pCanvas.width / 2, pCanvas.height / 2);
-
-      const card = document.createElement('div');
-      card.className = 'p-2 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-indigo-500/50 cursor-pointer transition text-center space-y-1 group';
-      card.innerHTML = `
-        <img src="${pCanvas.toDataURL()}" class="w-full h-12 object-cover rounded-lg border border-slate-800/80 group-hover:opacity-90">
-        <p class="text-[11px] font-medium text-slate-400 group-hover:text-indigo-300 truncate">${preset.name}</p>
-      `;
-
-      card.addEventListener('click', () => {
-        if (activeSampleCard) {
-          activeSampleCard.classList.remove('sample-card-active');
-          activeSampleCard = null;
-        }
-        drawCaptcha(preset.text, { lines: preset.lines });
-      });
-
-      presetsContainer.appendChild(card);
+  if (btnGenCombo) {
+    btnGenCombo.addEventListener('click', () => {
+      const text = getRandomString(4).toUpperCase() + Math.floor(Math.random() * 90 + 10);
+      drawCaptcha(text, { lines: 7 });
     });
   }
 

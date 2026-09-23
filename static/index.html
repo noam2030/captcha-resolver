@@ -9,7 +9,7 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="stylesheet" href="/static/styles.css?v=3">
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -88,102 +88,109 @@
       <!-- Left Column: Image Source (Project Resources, Upload, Generator) -->
       <div class="lg:col-span-5 space-y-6">
         
-        <!-- Source Selector Tabs Card -->
+        <!-- Project Sample Challenges (4 Small Preview Icons) -->
         <div class="bg-slate-900/60 rounded-2xl p-5 border border-slate-800/80 shadow-xl space-y-4">
           <div class="flex items-center justify-between border-b border-slate-800 pb-3">
             <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
-              <i data-lucide="image-plus" class="w-4 h-4 text-indigo-400"></i> CAPTCHA Input Source
+              <i data-lucide="folder-git-2" class="w-4 h-4 text-indigo-400"></i> Project Sample Challenges
             </h3>
-            <span class="text-xs text-indigo-400 font-medium bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/20">
-              Demo Ready
+            <span class="text-[11px] text-indigo-400 font-medium bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/20">
+              4 Pre-loaded
             </span>
           </div>
 
-          <!-- Navigation Tabs -->
-          <div class="flex rounded-xl bg-slate-950 p-1 border border-slate-800 text-xs font-medium gap-1">
-            <button id="tab-btn-resources" class="flex-1 py-2 px-2.5 rounded-lg text-white bg-indigo-600 shadow flex items-center justify-center gap-1.5 transition">
-              <i data-lucide="folder-git-2" class="w-3.5 h-3.5"></i> Project Samples
+          <p class="text-xs text-slate-400">Click any sample icon below to select it as if you uploaded it:</p>
+
+          <!-- 4 Small Icons Preview Grid -->
+          <div class="grid grid-cols-2 gap-3" id="sample-icons-grid">
+            
+            <!-- Icon 1: Alphanumeric -->
+            <button type="button" class="sample-icon-btn group p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-indigo-500 focus:outline-none transition-all text-left flex items-center gap-3 cursor-pointer" data-id="alphanumeric" data-src="/static/samples/sample_alphanumeric.jpg" data-title="Alphanumeric: K8N49P">
+              <img src="/static/samples/sample_alphanumeric.jpg" alt="Alphanumeric" class="w-14 h-11 object-cover rounded-lg border border-slate-800 bg-slate-900 group-hover:scale-105 transition-transform shrink-0">
+              <div class="min-w-0">
+                <p class="text-xs font-semibold text-slate-200 group-hover:text-indigo-300 truncate">Alphanumeric</p>
+                <p class="text-[10px] text-slate-400 font-mono">K8N49P</p>
+              </div>
             </button>
-            <button id="tab-btn-upload" class="flex-1 py-2 px-2.5 rounded-lg text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1.5 transition">
-              <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i> Upload / Paste
+
+            <!-- Icon 2: Math Puzzle -->
+            <button type="button" class="sample-icon-btn group p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-emerald-500 focus:outline-none transition-all text-left flex items-center gap-3 cursor-pointer" data-id="math" data-src="/static/samples/sample_math.jpg" data-title="Math Puzzle: 24 + 17 = 41">
+              <img src="/static/samples/sample_math.jpg" alt="Math Puzzle" class="w-14 h-11 object-cover rounded-lg border border-slate-800 bg-slate-900 group-hover:scale-105 transition-transform shrink-0">
+              <div class="min-w-0">
+                <p class="text-xs font-semibold text-slate-200 group-hover:text-emerald-300 truncate">Math Puzzle</p>
+                <p class="text-[10px] text-slate-400 font-mono">24 + 17 = ?</p>
+              </div>
             </button>
-            <button id="tab-btn-generator" class="flex-1 py-2 px-2.5 rounded-lg text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1.5 transition">
-              <i data-lucide="sparkle" class="w-3.5 h-3.5"></i> Generator
+
+            <!-- Icon 3: Photo Grid -->
+            <button type="button" class="sample-icon-btn group p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-amber-500 focus:outline-none transition-all text-left flex items-center gap-3 cursor-pointer" data-id="grid" data-src="/static/samples/sample_grid.jpg" data-title="Photo Grid: Traffic Lights">
+              <img src="/static/samples/sample_grid.jpg" alt="Traffic Lights Grid" class="w-14 h-11 object-cover rounded-lg border border-slate-800 bg-slate-900 group-hover:scale-105 transition-transform shrink-0">
+              <div class="min-w-0">
+                <p class="text-xs font-semibold text-slate-200 group-hover:text-amber-300 truncate">Photo Grid</p>
+                <p class="text-[10px] text-slate-400">Traffic Lights</p>
+              </div>
+            </button>
+
+            <!-- Icon 4: Warped Word -->
+            <button type="button" class="sample-icon-btn group p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-purple-500 focus:outline-none transition-all text-left flex items-center gap-3 cursor-pointer" data-id="word" data-src="/static/samples/sample_word.jpg" data-title="Warped Word: overlook">
+              <img src="/static/samples/sample_word.jpg" alt="Warped Word" class="w-14 h-11 object-cover rounded-lg border border-slate-800 bg-slate-900 group-hover:scale-105 transition-transform shrink-0">
+              <div class="min-w-0">
+                <p class="text-xs font-semibold text-slate-200 group-hover:text-purple-300 truncate">Warped Word</p>
+                <p class="text-[10px] text-slate-400 font-mono">overlook</p>
+              </div>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- Custom Upload & Drag/Drop Card -->
+        <div class="bg-slate-900/60 rounded-2xl p-5 border border-slate-800/80 shadow-xl space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+              <i data-lucide="upload-cloud" class="w-4 h-4 text-indigo-400"></i> Or Upload / Paste Your Own
+            </h3>
+            <span class="text-xs text-slate-500">Local File</span>
+          </div>
+
+          <div id="drop-zone" class="border-2 border-dashed border-slate-700 hover:border-indigo-500/60 rounded-xl p-5 text-center transition-all cursor-pointer bg-slate-950/40 hover:bg-indigo-950/10 group">
+            <input type="file" id="file-input" accept="image/*" class="hidden">
+            <div class="space-y-2">
+              <div class="w-10 h-10 mx-auto rounded-full bg-slate-800 group-hover:bg-indigo-600/20 flex items-center justify-center text-slate-400 group-hover:text-indigo-400 transition-colors">
+                <i data-lucide="upload" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <p class="text-xs font-medium text-slate-200 group-hover:text-indigo-300">
+                  Click to browse or drop an image here
+                </p>
+                <p class="text-[11px] text-slate-500 mt-0.5">Or press <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 font-mono text-slate-300">Ctrl+V</kbd> to paste</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Synthesizer Card -->
+        <div class="bg-slate-900/60 rounded-2xl p-5 border border-slate-800/80 shadow-xl space-y-3">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="sparkle" class="w-3.5 h-3.5 text-cyan-400"></i> Procedural Canvas Generator
+            </label>
+            <span class="text-[11px] text-slate-500">Synthetic</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="btn-gen-text" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 flex items-center justify-center gap-2 border border-slate-700 transition">
+              <i data-lucide="type" class="w-3.5 h-3.5 text-indigo-400"></i> Distorted Text
+            </button>
+            <button id="btn-gen-math" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 flex items-center justify-center gap-2 border border-slate-700 transition">
+              <i data-lucide="calculator" class="w-3.5 h-3.5 text-emerald-400"></i> Math Puzzle
+            </button>
+            <button id="btn-gen-noise" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 flex items-center justify-center gap-2 border border-slate-700 transition">
+              <i data-lucide="activity" class="w-3.5 h-3.5 text-amber-400"></i> Wavy & Noisy
+            </button>
+            <button id="btn-gen-combo" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 flex items-center justify-center gap-2 border border-slate-700 transition">
+              <i data-lucide="shuffle" class="w-3.5 h-3.5 text-purple-400"></i> Alphanumeric
             </button>
           </div>
-
-          <!-- Tab 1: Project Resources (Samples) -->
-          <div id="tab-content-resources" class="space-y-3">
-            <div class="flex items-center justify-between">
-              <p class="text-xs text-slate-400">Choose a bundled challenge to demonstrate the agent:</p>
-              <button id="btn-reload-samples" class="text-slate-500 hover:text-slate-300 p-1 transition" title="Reload samples">
-                <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
-              </button>
-            </div>
-
-            <!-- Samples Gallery List -->
-            <div id="samples-gallery" class="space-y-2.5 max-h-[440px] overflow-y-auto pr-1">
-              <!-- Populated dynamically via app.js -->
-            </div>
-          </div>
-
-          <!-- Tab 2: Upload & Paste -->
-          <div id="tab-content-upload" class="hidden space-y-4">
-            <!-- Drag and Drop Zone -->
-            <div id="drop-zone" class="border-2 border-dashed border-slate-700 hover:border-indigo-500/60 rounded-xl p-6 text-center transition-all cursor-pointer bg-slate-950/40 hover:bg-indigo-950/10 group">
-              <input type="file" id="file-input" accept="image/*" class="hidden">
-              <div class="space-y-3">
-                <div class="w-12 h-12 mx-auto rounded-full bg-slate-800 group-hover:bg-indigo-600/20 flex items-center justify-center text-slate-400 group-hover:text-indigo-400 transition-colors">
-                  <i data-lucide="upload-cloud" class="w-6 h-6"></i>
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-slate-200 group-hover:text-indigo-300">
-                    Click to upload or drag & drop
-                  </p>
-                  <p class="text-xs text-slate-500 mt-1">PNG, JPG, WEBP or GIF (Max 10MB)</p>
-                </div>
-              </div>
-            </div>
-            <p class="text-xs text-center text-slate-500">Or press <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 font-mono text-slate-300">Ctrl+V</kbd> to paste an image</p>
-          </div>
-
-          <!-- Tab 3: Canvas Generator -->
-          <div id="tab-content-generator" class="hidden space-y-4">
-            <div class="space-y-3">
-              <div class="flex items-center justify-between">
-                <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <i data-lucide="sparkle" class="w-3.5 h-3.5 text-cyan-400"></i> Instant Synthesizer
-                </label>
-                <span class="text-[11px] text-slate-500">Client-side procedural</span>
-              </div>
-              <div class="grid grid-cols-2 gap-2">
-                <button id="btn-gen-text" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 flex items-center justify-center gap-2 border border-slate-700 transition">
-                  <i data-lucide="type" class="w-3.5 h-3.5 text-indigo-400"></i> Distorted Text
-                </button>
-                <button id="btn-gen-math" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 flex items-center justify-center gap-2 border border-slate-700 transition">
-                  <i data-lucide="calculator" class="w-3.5 h-3.5 text-emerald-400"></i> Math Puzzle
-                </button>
-                <button id="btn-gen-noise" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 flex items-center justify-center gap-2 border border-slate-700 transition">
-                  <i data-lucide="activity" class="w-3.5 h-3.5 text-amber-400"></i> Wavy & Noisy
-                </button>
-                <button id="btn-gen-combo" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 flex items-center justify-center gap-2 border border-slate-700 transition">
-                  <i data-lucide="shuffle" class="w-3.5 h-3.5 text-purple-400"></i> Alphanumeric
-                </button>
-              </div>
-            </div>
-
-            <!-- Quick Mini Presets -->
-            <div class="space-y-2 pt-2 border-t border-slate-800/80">
-              <label class="text-xs font-semibold text-slate-400">Synthetic Presets</label>
-              <div class="grid grid-cols-2 gap-2" id="presets-container">
-                <!-- Populated via app.js -->
-              </div>
-            </div>
-
-            <!-- Hidden canvas for client-side captcha synthesis -->
-            <canvas id="captcha-canvas" width="300" height="100" class="hidden"></canvas>
-          </div>
-
+          <canvas id="captcha-canvas" width="300" height="100" class="hidden"></canvas>
         </div>
 
       </div>
@@ -322,7 +329,7 @@
     ADK Gemini CAPTCHA Resolver &bull; Deployed on Google Cloud &bull; Connected to Load Balancer
   </footer>
 
-  <script src="/static/app.js"></script>
+  <script src="/static/app.js?v=3"></script>
   <script>
     lucide.createIcons();
   </script>
