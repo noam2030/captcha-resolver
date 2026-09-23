@@ -87,44 +87,36 @@ async def handle_samples(request):
     """Return available sample CAPTCHA images bundled in the project resources."""
     samples = [
         {
-            "id": "alphanumeric",
-            "title": "Alphanumeric Code",
-            "type": "alphanumeric",
-            "description": "Distorted characters 'K8N49P' with strike-through lines & noise",
-            "url": "/static/samples/sample_alphanumeric.jpg",
-            "expected": "K8N49P"
-        },
-        {
-            "id": "math",
-            "title": "Math Arithmetic Challenge",
-            "type": "math",
-            "description": "Math problem '24 + 17 = ?' on textured paper with scratches",
-            "url": "/static/samples/sample_math.jpg",
-            "expected": "41"
-        },
-        {
             "id": "grid",
-            "title": "3x3 Object Grid Selection",
+            "title": "Photo Grid (Traffic Lights)",
             "type": "grid_selection",
-            "description": "Photo verification: 'Select all squares with traffic lights'",
+            "description": "3x3 Photo verification: 'Select all squares with traffic lights' (Tiles 2, 6, 7)",
             "url": "/static/samples/sample_grid.jpg",
             "expected": "Tiles 2, 6, 7"
         },
         {
-            "id": "word",
-            "title": "Warped Word Puzzle",
-            "type": "word",
-            "description": "Distorted dictionary word 'overlook' with wavy ripple lines",
-            "url": "/static/samples/sample_word.jpg",
-            "expected": "overlook"
+            "id": "hard_alpha",
+            "title": "Extreme Distorted Code",
+            "type": "alphanumeric",
+            "description": "Heavy strike-through lines, ink splatters, and perspective skew: 'X8kR4M'",
+            "url": "/static/samples/sample_hard_alpha.jpg",
+            "expected": "X8kR4M"
         },
         {
-            "id": "wavy",
-            "title": "Colorful Wavy Distorted",
+            "id": "hard_math",
+            "title": "Complex Math Equation",
+            "type": "math",
+            "description": "Handwritten multi-step arithmetic '(35 + 28) - 19 = ?' with smudges and grid lines",
+            "url": "/static/samples/sample_hard_math.jpg",
+            "expected": "44"
+        },
+        {
+            "id": "hard_3d",
+            "title": "3D Warped Wiremesh",
             "type": "alphanumeric",
-            "description": "High-contrast distorted text 'R9X2B5' with swirl interference",
-            "url": "/static/samples/sample_wavy.jpg",
-            "expected": "R9X2B5"
+            "description": "Extreme 3D embossed warped characters '7Wp8K3' behind security wire mesh",
+            "url": "/static/samples/sample_hard_3d.jpg",
+            "expected": "7Wp8K3"
         }
     ]
     return web.json_response({"samples": samples, "count": len(samples)})
@@ -140,11 +132,14 @@ async def handle_solve(request):
         # Fallback to load bundled project resource if sample_id provided
         if not image_data and sample_id:
             sample_file_map = {
-                "alphanumeric": "sample_alphanumeric.jpg",
-                "math": "sample_math.jpg",
                 "grid": "sample_grid.jpg",
-                "word": "sample_word.jpg",
-                "wavy": "sample_wavy.jpg"
+                "hard_alpha": "sample_hard_alpha.jpg",
+                "hard_math": "sample_hard_math.jpg",
+                "hard_3d": "sample_hard_3d.jpg",
+                "alphanumeric": "sample_hard_alpha.jpg",
+                "math": "sample_hard_math.jpg",
+                "word": "sample_hard_3d.jpg",
+                "wavy": "sample_hard_3d.jpg"
             }
             if sample_id in sample_file_map:
                 filename = sample_file_map[sample_id]

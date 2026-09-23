@@ -9,7 +9,7 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="/static/styles.css?v=3">
+  <link rel="stylesheet" href="/static/styles.css?v=4">
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -104,26 +104,8 @@
           <!-- 4 Small Icons Preview Grid -->
           <div class="grid grid-cols-2 gap-3" id="sample-icons-grid">
             
-            <!-- Icon 1: Alphanumeric -->
-            <button type="button" class="sample-icon-btn group p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-indigo-500 focus:outline-none transition-all text-left flex items-center gap-3 cursor-pointer" data-id="alphanumeric" data-src="/static/samples/sample_alphanumeric.jpg" data-title="Alphanumeric: K8N49P">
-              <img src="/static/samples/sample_alphanumeric.jpg" alt="Alphanumeric" class="w-14 h-11 object-cover rounded-lg border border-slate-800 bg-slate-900 group-hover:scale-105 transition-transform shrink-0">
-              <div class="min-w-0">
-                <p class="text-xs font-semibold text-slate-200 group-hover:text-indigo-300 truncate">Alphanumeric</p>
-                <p class="text-[10px] text-slate-400 font-mono">K8N49P</p>
-              </div>
-            </button>
-
-            <!-- Icon 2: Math Puzzle -->
-            <button type="button" class="sample-icon-btn group p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-emerald-500 focus:outline-none transition-all text-left flex items-center gap-3 cursor-pointer" data-id="math" data-src="/static/samples/sample_math.jpg" data-title="Math Puzzle: 24 + 17 = 41">
-              <img src="/static/samples/sample_math.jpg" alt="Math Puzzle" class="w-14 h-11 object-cover rounded-lg border border-slate-800 bg-slate-900 group-hover:scale-105 transition-transform shrink-0">
-              <div class="min-w-0">
-                <p class="text-xs font-semibold text-slate-200 group-hover:text-emerald-300 truncate">Math Puzzle</p>
-                <p class="text-[10px] text-slate-400 font-mono">24 + 17 = ?</p>
-              </div>
-            </button>
-
-            <!-- Icon 3: Photo Grid -->
-            <button type="button" class="sample-icon-btn group p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-amber-500 focus:outline-none transition-all text-left flex items-center gap-3 cursor-pointer" data-id="grid" data-src="/static/samples/sample_grid.jpg" data-title="Photo Grid: Traffic Lights">
+            <!-- Icon 1: Photo Grid (Traffic Lights) - FIRST -->
+            <button type="button" class="sample-icon-btn group p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-amber-500 focus:outline-none transition-all text-left flex items-center gap-3 cursor-pointer" data-id="grid" data-src="/static/samples/sample_grid.jpg" data-title="Photo Grid: Traffic Lights (Tiles 2, 6, 7)">
               <img src="/static/samples/sample_grid.jpg" alt="Traffic Lights Grid" class="w-14 h-11 object-cover rounded-lg border border-slate-800 bg-slate-900 group-hover:scale-105 transition-transform shrink-0">
               <div class="min-w-0">
                 <p class="text-xs font-semibold text-slate-200 group-hover:text-amber-300 truncate">Photo Grid</p>
@@ -131,12 +113,30 @@
               </div>
             </button>
 
-            <!-- Icon 4: Warped Word -->
-            <button type="button" class="sample-icon-btn group p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-purple-500 focus:outline-none transition-all text-left flex items-center gap-3 cursor-pointer" data-id="word" data-src="/static/samples/sample_word.jpg" data-title="Warped Word: overlook">
-              <img src="/static/samples/sample_word.jpg" alt="Warped Word" class="w-14 h-11 object-cover rounded-lg border border-slate-800 bg-slate-900 group-hover:scale-105 transition-transform shrink-0">
+            <!-- Icon 2: Extreme Distorted Code -->
+            <button type="button" class="sample-icon-btn group p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-indigo-500 focus:outline-none transition-all text-left flex items-center gap-3 cursor-pointer" data-id="hard_alpha" data-src="/static/samples/sample_hard_alpha.jpg" data-title="Heavy Strike & Splatter: X8kR4M">
+              <img src="/static/samples/sample_hard_alpha.jpg" alt="Complex Distorted" class="w-14 h-11 object-cover rounded-lg border border-slate-800 bg-slate-900 group-hover:scale-105 transition-transform shrink-0">
               <div class="min-w-0">
-                <p class="text-xs font-semibold text-slate-200 group-hover:text-purple-300 truncate">Warped Word</p>
-                <p class="text-[10px] text-slate-400 font-mono">overlook</p>
+                <p class="text-xs font-semibold text-slate-200 group-hover:text-indigo-300 truncate">Extreme Code</p>
+                <p class="text-[10px] text-slate-400 font-mono">X8kR4M</p>
+              </div>
+            </button>
+
+            <!-- Icon 3: Complex Math Puzzle -->
+            <button type="button" class="sample-icon-btn group p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-emerald-500 focus:outline-none transition-all text-left flex items-center gap-3 cursor-pointer" data-id="hard_math" data-src="/static/samples/sample_hard_math.jpg" data-title="Complex Math: (35 + 28) - 19 = 44">
+              <img src="/static/samples/sample_hard_math.jpg" alt="Complex Math" class="w-14 h-11 object-cover rounded-lg border border-slate-800 bg-slate-900 group-hover:scale-105 transition-transform shrink-0">
+              <div class="min-w-0">
+                <p class="text-xs font-semibold text-slate-200 group-hover:text-emerald-300 truncate">Complex Math</p>
+                <p class="text-[10px] text-slate-400 font-mono">(35+28)-19</p>
+              </div>
+            </button>
+
+            <!-- Icon 4: 3D Warped Wiremesh -->
+            <button type="button" class="sample-icon-btn group p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-cyan-500 focus:outline-none transition-all text-left flex items-center gap-3 cursor-pointer" data-id="hard_3d" data-src="/static/samples/sample_hard_3d.jpg" data-title="3D Wiremesh Warp: 7Wp8K3">
+              <img src="/static/samples/sample_hard_3d.jpg" alt="3D Warped" class="w-14 h-11 object-cover rounded-lg border border-slate-800 bg-slate-900 group-hover:scale-105 transition-transform shrink-0">
+              <div class="min-w-0">
+                <p class="text-xs font-semibold text-slate-200 group-hover:text-cyan-300 truncate">3D Wiremesh</p>
+                <p class="text-[10px] text-slate-400 font-mono">7Wp8K3</p>
               </div>
             </button>
 
@@ -329,7 +329,7 @@
     ADK Gemini CAPTCHA Resolver &bull; Deployed on Google Cloud &bull; Connected to Load Balancer
   </footer>
 
-  <script src="/static/app.js?v=3"></script>
+  <script src="/static/app.js?v=4"></script>
   <script>
     lucide.createIcons();
   </script>
